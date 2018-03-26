@@ -17,10 +17,7 @@ favicon: "/img/favicon.png"
 
 # Comments. Choose one by filling up the information
 comments:
-  # Facebook comments
-  facebook:
-    appid: 130664834438658
-    comment_count: 5
+  disqus_shortname: slowcoder
 
 # Google Analytics Tracking ID
 google_analytics: UA-57902136-16
