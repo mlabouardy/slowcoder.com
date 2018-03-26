@@ -2,7 +2,7 @@
 
 # SlowCoder Blog
 
-Technology news & tutorials include:
+Technology news & tutorials about the following topics:
 
 * DevOps
 * Cloud
