@@ -1,0 +1,31 @@
+# Header
+menu:
+  Home: /
+  Archives: /archives
+
+# Default post title
+default_post_title: SlowCoder
+
+# Default post cover index page
+default_cover_index: /img/default_450_450.png
+
+# Default post cover index page
+default_cover_detail: /img/default_1300_500.png
+
+# Favicon
+favicon: "/img/favicon.png"
+
+# Comments. Choose one by filling up the information
+comments:
+  # Facebook comments
+  facebook:
+    appid: 130664834438658
+    comment_count: 5
+
+# Google Analytics Tracking ID
+google_analytics: UA-57902136-16
+
+# Social Accounts
+twitter_url: https://twitter.com/mlabouardy
+instagram_url: https://instagram.com/labouardy
+youtube_url: https://www.youtube.com/channel/UCJVgMZRrzesDSqKN5WU31Rw

@@ -1,0 +1,40 @@
+<!-- Navigation -->
+<header>
+    <div class="logo">
+        <a href="<%- config.root %>"><%- config.title || "" %></a>
+    </div><!-- end logo -->
+
+    <div id="menu_icon"></div>
+    <nav>
+        <ul>
+            <% for (var i in theme.menu){ %>
+            <li>
+                <a href="<%- url_for(theme.menu[i]) %>"><%= i %></a>
+            </li>
+            <% } %>
+        </ul>
+    </nav><!-- end navigation menu -->
+
+    <div class="footer clearfix">
+        <ul class="social clearfix">
+            <% if (theme.twitter_url) { %>
+                <li><a href="<%- theme.twitter_url %>" class="twitter" target="_blank" data-title="Twitter"></a></li>
+            <% } %>
+            <% if (theme.facebook_url) { %>
+                <li><a href="<%- theme.facebook_url %>" class="fb" target="_blank" data-title="Facebook"></a></li>
+            <% } %>
+            <% if (theme.instagram_url) { %>
+                <li><a href="<%- theme.instagram_url %>" class="instagram" target="_blank" data-title="Instagram"></a></li>
+            <% } %>
+            <% if (theme.youtube_url) { %>
+                <li><a href="<%- theme.youtube_url %>" class="youtube" target="_blank" data-title="Youtube"></a></li>
+            <% } %>
+        </ul><!-- end social -->
+
+        <div class="rights">
+            <p>Copyright © 2018 SlowCoder.</p>
+            <p>Design by <a href="http://labouardy.com">Mohamed Labouardy</a></p>
+            <p>Hexo Theme by <a href="http://www.codeblocq.com/">Jonathan K.</a></p>
+        </div><!-- end rights -->
+    </div ><!-- end footer -->
+</header><!-- end header -->
