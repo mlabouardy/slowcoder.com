@@ -10,4 +10,8 @@ Technology news & tutorials about the following topics:
 * IoT
 * NLP & ChatBots
 * Mobile
-* Programming
+* Web Programming
+
+# Contributions
+
+Feel free to contribute
