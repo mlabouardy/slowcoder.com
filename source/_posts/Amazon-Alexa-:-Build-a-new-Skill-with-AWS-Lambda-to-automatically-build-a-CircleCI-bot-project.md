@@ -8,7 +8,7 @@ tags:
 - Serverless
 categories:
 - Serverless
-cover_index: /assets/Build-a-new-Skill-with-AWS-Lambda-to-automatically-build-a-CircleCI-bot-project.png
+cover_index: /assets/alexa-lambda.jpg
 ---
 
 Amazon Alexa : Build a new Skill with AWS Lambda to automatically build a CircleCI bot project
