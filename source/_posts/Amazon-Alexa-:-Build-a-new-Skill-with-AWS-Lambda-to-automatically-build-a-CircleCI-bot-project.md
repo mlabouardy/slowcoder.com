@@ -1,5 +1,5 @@
 ---
-title: Build a new Skill with AWS Lambda 
+title: Build a new Skill with AWS Lambda to automatically build a CircleCI bot project 
 date: 2018-06-14 10:30:00
 tags:
 - AWS
