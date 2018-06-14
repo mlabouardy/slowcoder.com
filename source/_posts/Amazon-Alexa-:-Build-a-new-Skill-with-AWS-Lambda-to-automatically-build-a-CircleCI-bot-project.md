@@ -1,20 +1,18 @@
 ---
-title: Amazon Alexa : Build a new Skill with AWS Lambda to automatically build a CircleCI bot project
-date: 2018-06-14 10:09:58
+title: Build a new Skill with AWS Lambda 
+date: 2018-06-14 10:30:00
 tags:
 - AWS
-- Serverless
 - Alexa
 - Lambda
+- Serverless
 categories:
 - Serverless
-cover_index: /assets/Build-a-new-Skill-with-AWS-Lambda-to-automatically-build-a-CircleCI-bot-project?md.png.png
+cover_index: /assets/Build-a-new-Skill-with-AWS-Lambda-to-automatically-build-a-CircleCI-bot-project.png
 ---
-
 
 Amazon Alexa : Build a new Skill with AWS Lambda to automatically build a CircleCI bot project
 Alexa is the Amazon intelligent voice-control agent. It is a cloud based vocal service. To take advantage of Alexa, Amazon offers voice products which are headless devices with no face or UI. For instance : Echo, Echo Plus, Echo Dot, Tap.
-
 ![](https://cdn-images-1.medium.com/max/800/1*qd4j69sbk5wHci8K7fJz1Q.png)
 
 Amazon Echo Dot, Echo 1st and 2nd generations (left to right)
@@ -139,9 +137,12 @@ Save the test configuration and hit “Test”. A success message will be displa
 
 The code of this simple function is :
 
-<script src="https://gist.github.com/Raniazy/553280643620c630e6f4fccccd513933.js"></script>
-
-![](https://gist.github.com/Raniazy/553280643620c630e6f4fccccd513933.js)
+```
+exports.handler = (event, context, callback) => {
+    // TODO implement
+    callback(null, 'Hello from Lambda');
+};
+```
 
 Note that the function should expose a handler object.
 
@@ -158,7 +159,7 @@ Now that we set the endpoints, the connection between our Alexa Skill and Lambda
 One last thing to take care of is updating Lambda function to return an appropriate JSON for Alexa Skill.
 The new Lambda function is :
 
-{% codeblock %}
+```
 exports.handler = (event, context, callback) => {
     var responseJson =  {
     version: "1.0",
@@ -174,7 +175,7 @@ exports.handler = (event, context, callback) => {
     };
     callback(null,responseJson);
 };
-{% codeblock %}
+```
 
 Don’t forget to save your Lambda.
 
@@ -187,8 +188,41 @@ Indeed, we received the expected response while invoking our Skill using the sen
 
 Now that we know how to build a simple Hello world Lambda function, let’s upgrade it to handle Intents.
 
-<script src="https://gist.github.com/Raniazy/56b5c6979537d09e67b6f2b73255d817.js"></script>
-![](https://gist.github.com/Raniazy/56b5c6979537d09e67b6f2b73255d817.js)
+```
+exports.handler = (event, context, callback) => {
+    try {
+        if (event.request.type === 'LaunchRequest') {
+            callback(null, buildResponse('Hello from Lambda'));
+        } else if (event.request.type === 'IntentRequest') {
+            const intentName = event.request.intent.name;
+
+            if (intentName === 'deployProject') {
+                callback(null, buildResponse("I've heard a deployment intent"));
+            } else {
+                callback(null, buildResponse("Sorry, i don't understand"));
+            }
+        } else if (event.request.type === 'SessionEndedRequest') {
+            callback(null, buildResponse('Session Ended'));
+        }
+    } catch (e) {
+        context.fail(`Exception: ${e}`);
+    }
+};
+
+function buildResponse(response) {
+    return {
+        version: '1.0',
+        response: {
+            outputSpeech: {
+                type: 'PlainText',
+                text: response,
+            },
+            shouldEndSession: true,
+        },
+        sessionAttributes: {},
+    };
+}
+```
 
 In this Lambda Function, we first verify the type of the request :
 - LaunchRequest is created with an invoke message similar to : “Aexa, open deployment”. In this case, I set up the response to “Hello from Lambda”.
@@ -196,6 +230,7 @@ In this Lambda Function, we first verify the type of the request :
 
 Save The function and go back to test the Skill’s responses.
 
+![](https://cdn-images-1.medium.com/max/800/1*RfVuS_oeMoyBSYecjA0YBQ.png)
 
 Test Intent Request
 At this point, we’ve built a Skill with Alexa Skills Kit. We also created a Lambda Function and we glued the whole thing using Endpoints.
@@ -206,33 +241,135 @@ We will use CircleCI’s API endpoint for building a branch in a GitHub project.
 
 Beforehand, we wrote Lambda Functions directly on the Online Editor. Another way to build Lambda Function is to upload a .zip file in which you put your function and dependencies. (By default, Lambda waits for an index.js file. But it can be any file providing that you change the default settings of your Lambda function from index.handler to file_name.handler)
 
+```
 npm install request
 zip -r index.zip index.js node_modules
+```
+
 Our new Lambda Function looks like :
 
+```
+var request = require('request');
+
+exports.handler = (event, context, callback) => {
+    try {
+        if (event.request.type === 'LaunchRequest') {
+            callback(null, buildResponse('Hello from Lambda'));
+        } else if (event.request.type === 'IntentRequest') {
+            const intentName = event.request.intent.name;
+
+            if (intentName === 'deployProject') {
+                buildCircleCiProject(function (err, result) {
+                    if(!err) callback(null, buildResponse("The build was launched. make sure you take a look. See you."));
+                    else callback(null, buildResponse("Please check your build logs. Something went wrong."));
+                });
+            } else {
+                callback(null, buildResponse("Sorry, i don't understand"));
+            }
+        } else if (event.request.type === 'SessionEndedRequest') {
+            callback(null, buildResponse('Session Ended'));
+        }
+    } catch (e) {
+        context.fail(`Exception: ${e}`);
+    }
+};
+
+function buildResponse(response) {
+    return {
+        version: '1.0',
+        response: {
+            outputSpeech: {
+                type: 'PlainText',
+                text: response,
+            },
+            shouldEndSession: true,
+        },
+        sessionAttributes: {},
+    };
+}
+
+function buildCircleCiProject(callback) {
+    var options = {
+        url: `https://circleci.com/api/v1.1/project/github/Raniazy/bot-backend/tree/dockerized-bot?circle-token=${process.env.CIRCLE_CI_TOKEN}`,
+        headers: {
+            'User-Agent': 'alexa-skill'
+        }
+    };
+    request.post(options, function(error, response, body){
+        if(error){
+            callback("ERROR");
+
+        } else {
+            callback(null,"SUCCESS");
+        }
+    });
+}
+```
 
 All I had to do is add a new function that calls a POST request to CircleCI in order to build a project.
 Remember the Test button on Lambda Function. To perform a test, we should prepare all the inputs needed by our function.
 There’s a pre-configured Test sample automatically created for each of Skill’s intent:
-
+```
+{
+  "session": {
+    "new": true,
+    "sessionId": "amzn1.echo-api.session.[unique-value-here]",
+    "attributes": {},
+    "user": {
+      "userId": "amzn1.ask.account.[unique-value-here]"
+    },
+    "application": {
+      "applicationId": "amzn1.ask.skill.[unique-value-here]"
+    }
+  },
+  "version": "1.0",
+  "request": {
+    "locale": "en-US",
+    "timestamp": "2016-10-27T18:21:44Z",
+    "type": "IntentRequest",
+    "requestId": "amzn1.echo-api.request.[unique-value-here]",
+    "intent": {
+      "name": "deployProject"
+    }
+  },
+  "context": {
+    "AudioPlayer": {
+      "playerActivity": "IDLE"
+    },
+    "System": {
+      "device": {
+        "supportedInterfaces": {
+          "AudioPlayer": {}
+        }
+      },
+      "application": {
+        "applicationId": "amzn1.ask.skill.[unique-value-here]"
+      },
+      "user": {
+        "userId": "amzn1.ask.account.[unique-value-here]"
+      }
+    }
+  }
+}
+```
 
 The Test should reply to all requirements of your Lambda Function. In the example, the test defines the request as an IntentRequest (request.type = ‘intentRequest’) and the intent.name as ‘deployProject’. It’s a simulation of the request sent by Alexa to Lambda Function.
 
+![](https://cdn-images-1.medium.com/max/1000/1*zl4VRyLx9ALJiSpqJ0B15g.png)
 
 Test result
 To test the whole thing on Alexa :
-
+![](https://cdn-images-1.medium.com/max/800/1*EpCcEZAO4iaKNwU1wILRwQ.png)
 
 Heading over to CircleCI platform, I found a running build :
 
+![](https://cdn-images-1.medium.com/max/1000/1*pPw4A9B2qg4G5BOqvvTRrQ.png)
 
 CircleCi Platform: a new build was launched
 Success ! When I asked Alexa to deploy the project, the Alexa Skill Kit trigger sent an event to Lambda Function that was waiting for a signal having the exact ‘deployProject’ intent to call CircleCI.
 
 Now the project is well dockerized and automatically deployed to Heroku.
 Code is available on this GitHub repository.
-
-video_demo
 
 In this post, we’ve seen the full path from Setting up Amazon accounts to automated project deployment. We have created an Alexa Skill using Alexa Skills Kit and Linked it to a Lambda Function created with AWS Lambda service. To go further, you can update you Interaction Model with Slots : Project Name. This way, you can specify to Alexa which project to deploy.
 
