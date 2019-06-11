@@ -8,7 +8,7 @@ tags:
 - VPC
 categories:
 - Data
-cover_index: /assets/assets/Data-lake-insights-about-data-fidelity.jpeg
+cover_index: /assets/Data-lake-insights-about-data-fidelity.png
 ---
 
 It’s been a few weeks since I was thinking about writing this article about data fidelity in a data lake. These insights result of some constraints I have encountered in my one-year-mission in a project of building a Data Lake of a Moroccan Banking Group.
